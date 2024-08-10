@@ -1,5 +1,7 @@
 # Arduino Nano Unix Epoch Time Clock
 
+![Final Build](pics/clock1.jpg)
+
 This repository contains the code and schematic for building a Unix epoch time clock using an Arduino Nano and 10 7-segment displays.
 
 ## Project Description
@@ -25,6 +27,9 @@ If you'd like to replicate this project, you'll need the following components:
 - 1x ds3231 rtc module
 
 Follow the schematic provided to wire the components together. The code included in this repository will drive the displays and keep track of the Unix epoch time.
+
+![WorkInProgress](pics/clock2.jpeg)
+![WorkInProgress](pics/clock3.jpeg)
 
 ## Disclaimer
 
