@@ -3,7 +3,7 @@
   Description: Epoch Clock using arduino nano and  7-segment display x 10
   Author: Y-ZEN
   Date: 08/07/2024
-  Version: 1.0
+  Version: 1.1
   License: MIT License
   Note: Remember to disconnect pin RX/TX during code upload on Arduino 
 
@@ -88,6 +88,22 @@ bool lastStateBTN2 = false;
 bool flikerStateBTN2 = false;
 unsigned long lastPressedTimeBTN2 = 0;
 
+void loadEpochDigits(long value) {
+  for (int i = 0; i < 10; i++) {
+    epoch[i] = 0;
+  }
+
+  long x = value;
+  int i = 0;
+
+  while (x > 0 && i < 10) {
+    long y = x / 10;
+    epoch[i] = x - (10 * y);
+    x = y;
+    i++;
+  }
+}
+
 void setup() {                
 
   //Serial.begin(9600);
@@ -98,7 +114,15 @@ void setup() {
     //Serial.flush();
     while (1);
   }
-  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+
+  delay(500);
+
+  if (rtc.lostPower()) {
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  }
+
+  seconds = rtc.now().unixtime();
+  loadEpochDigits(seconds);
 
 // initialize the digital pins as outputs.
   pinMode(pinA, OUTPUT);   
@@ -336,17 +360,7 @@ void loop() {
     if (seconds > 9999999999) {
       seconds = 0;
     }
-    long x = 0;
-    long y;
-    int i = 0;
-    //int epoch[] = {0,0,0,0,0,0,0,0,0,0};
-    x = seconds;
-    while ( x > 0 ){
-        y=x/10 ;
-        epoch[i] = x-(10*y) ;
-        x=y ;
-        i++ ;
-    }
+    loadEpochDigits(seconds);
   }
 
   writeNumber(epoch[0],0,selectDigit,blinkOff);
@@ -427,6 +441,8 @@ void loop() {
         
         // Convert the string to a numeric value of type long
         seconds = atol(epochString.c_str());
+        // I don't think this is needed because will be saved to RTC when selectDigit > 9, but just in case
+        // rtc.adjust(DateTime(seconds)); 
       }
       lastStateBTN2 = currStateBTN2;
       lastPressedTimeBTN2 = currentMillis;
